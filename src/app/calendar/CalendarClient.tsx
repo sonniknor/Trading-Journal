@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useMemo } from 'react';
+import Link from 'next/link';
 import { Trade } from '@prisma/client';
 import { 
   startOfMonth, 
@@ -16,10 +17,11 @@ import {
   isToday
 } from 'date-fns';
 import { enUS } from 'date-fns/locale';
-import { ChevronLeft, ChevronRight, TrendingUp, TrendingDown, Target } from 'lucide-react';
+import { ChevronLeft, ChevronRight, TrendingUp, TrendingDown, Target, X } from 'lucide-react';
 
 export default function CalendarClient({ trades }: { trades: Trade[] }) {
   const [currentDate, setCurrentDate] = useState(new Date());
+  const [selectedDay, setSelectedDay] = useState<Date | null>(null);
 
   const prevMonth = () => setCurrentDate(subMonths(currentDate, 1));
   const nextMonth = () => setCurrentDate(addMonths(currentDate, 1));
@@ -57,6 +59,11 @@ export default function CalendarClient({ trades }: { trades: Trade[] }) {
     .filter(stat => stat.pnl >= 50).length;
   const losingDays = Object.values(dailyStats)
     .filter(stat => stat.pnl <= -50).length;
+
+  const selectedDayTrades = useMemo(() => {
+    if (!selectedDay) return [];
+    return trades.filter(t => isSameDay(new Date(t.entryTime), selectedDay));
+  }, [selectedDay, trades]);
 
   return (
     <div className="space-y-6">
@@ -152,7 +159,12 @@ export default function CalendarClient({ trades }: { trades: Trade[] }) {
             return (
               <div 
                 key={day.toString()} 
-                className={`min-h-[100px] p-3 rounded-2xl border transition-all ${bgClass} hover:scale-[1.02] cursor-default flex flex-col`}
+                onClick={() => {
+                  if (stat && stat.tradesCount > 0) {
+                    setSelectedDay(day);
+                  }
+                }}
+                className={`min-h-[100px] p-3 rounded-2xl border transition-all ${bgClass} hover:scale-[1.02] ${stat && stat.tradesCount > 0 ? 'cursor-pointer' : 'cursor-default'} flex flex-col`}
               >
                 <div className="flex justify-between items-start">
                   <span className={`font-semibold ${textClass}`}>
@@ -177,6 +189,53 @@ export default function CalendarClient({ trades }: { trades: Trade[] }) {
           })}
         </div>
       </div>
+
+      {/* Modal for viewing trades on a specific day */}
+      {selectedDay && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-in fade-in">
+          <div className="bg-gray-900 border border-white/10 rounded-2xl w-full max-w-3xl overflow-hidden shadow-2xl flex flex-col max-h-[80vh] animate-in slide-in-from-bottom-4">
+            <div className="p-5 border-b border-white/10 flex justify-between items-center bg-black/20">
+              <div>
+                <h3 className="text-xl font-bold text-white">Trades on {format(selectedDay, 'MMM d, yyyy')}</h3>
+                <p className="text-sm text-gray-400">{selectedDayTrades.length} execution{selectedDayTrades.length !== 1 ? 's' : ''}</p>
+              </div>
+              <button onClick={() => setSelectedDay(null)} className="p-2 bg-white/5 hover:bg-white/10 rounded-xl transition-colors text-gray-400 hover:text-white">
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+            <div className="overflow-y-auto flex-1 p-5 space-y-4">
+              {selectedDayTrades.map(trade => (
+                <div key={trade.id} className="glass-panel p-4 rounded-xl border border-white/5 flex items-center justify-between hover:bg-white/5 transition-colors">
+                  <div className="flex flex-col gap-1">
+                    <div className="flex items-center gap-3">
+                      <span className="font-bold text-white">{trade.symbol}</span>
+                      <span className={`px-2 py-0.5 rounded text-xs font-semibold ${trade.direction === 'Long' ? 'bg-green-500/10 text-green-400' : 'bg-red-500/10 text-red-400'}`}>
+                        {trade.direction}
+                      </span>
+                      <span className="text-sm text-gray-400">{format(new Date(trade.entryTime), 'HH:mm')}</span>
+                    </div>
+                    <div className="flex items-center gap-3 text-xs text-gray-500">
+                      <span>Setup: <span className="text-gray-300">{trade.setup || '-'}</span></span>
+                      <span>&bull;</span>
+                      <span>Grade: <span className="text-gray-300">{trade.grade || '-'}</span></span>
+                      <span>&bull;</span>
+                      <span>Session: <span className="text-gray-300">{trade.session || '-'}</span></span>
+                    </div>
+                  </div>
+                  <div className={`text-xl font-bold ${trade.pnl >= 50 ? 'text-green-400' : trade.pnl <= -50 ? 'text-red-400' : 'text-gray-400'}`}>
+                    ${trade.pnl.toFixed(2)}
+                  </div>
+                </div>
+              ))}
+            </div>
+            <div className="p-4 border-t border-white/10 bg-black/20 flex justify-end">
+              <Link href="/journal" className="text-sm font-medium text-blue-400 hover:text-blue-300 transition-colors bg-blue-500/10 px-4 py-2 rounded-lg">
+                Go to Journal for full details &rarr;
+              </Link>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
