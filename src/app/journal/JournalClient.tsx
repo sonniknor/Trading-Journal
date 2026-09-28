@@ -1,15 +1,46 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { format } from 'date-fns';
 import { Trade } from '@prisma/client';
 import { updateTrade, uploadScreenshot } from '@/app/actions';
-import { X, Save, ArrowRight, Activity, Clock, Upload } from 'lucide-react';
+import { X, Save, ArrowRight, Activity, Clock, Upload, Edit3 } from 'lucide-react';
 
 export default function JournalClient({ initialTrades }: { initialTrades: Trade[] }) {
   const [trades, setTrades] = useState<Trade[]>(initialTrades);
   const [selectedTrade, setSelectedTrade] = useState<Trade | null>(null);
+  const [isEditing, setIsEditing] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
+
+  useEffect(() => {
+    if (!selectedTrade) return;
+
+    const handlePaste = async (e: ClipboardEvent) => {
+      const items = e.clipboardData?.items;
+      if (!items) return;
+
+      for (let i = 0; i < items.length; i++) {
+        if (items[i].type.indexOf('image') !== -1) {
+          const file = items[i].getAsFile();
+          if (!file) continue;
+
+          setIsSaving(true);
+          const fd = new FormData();
+          fd.append('file', file);
+          const res = await uploadScreenshot(selectedTrade.id, fd);
+          if (res.success && res.data) {
+            setTrades(prev => prev.map(t => t.id === selectedTrade.id ? { ...t, screenshots: res.data.screenshots } : t));
+            setSelectedTrade(prev => prev ? { ...prev, screenshots: res.data.screenshots } : null);
+          }
+          setIsSaving(false);
+          break;
+        }
+      }
+    };
+
+    window.addEventListener('paste', handlePaste);
+    return () => window.removeEventListener('paste', handlePaste);
+  }, [selectedTrade]);
 
   const handleUpdate = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -38,7 +69,8 @@ export default function JournalClient({ initialTrades }: { initialTrades: Trade[
     const result = await updateTrade(selectedTrade.id, data);
     if (result.success) {
       setTrades(trades.map(t => t.id === selectedTrade.id ? { ...t, ...data } : t));
-      setSelectedTrade(null);
+      setSelectedTrade({ ...selectedTrade, ...data } as Trade);
+      setIsEditing(false);
     } else {
       alert("Error saving trade.");
     }
@@ -65,7 +97,10 @@ export default function JournalClient({ initialTrades }: { initialTrades: Trade[
               {trades.map((trade) => (
                 <tr 
                   key={trade.id} 
-                  onClick={() => setSelectedTrade(trade)}
+                  onClick={() => {
+                    setSelectedTrade(trade);
+                    setIsEditing(false);
+                  }}
                   className={`cursor-pointer transition-colors ${selectedTrade?.id === trade.id ? 'bg-blue-500/10' : 'hover:bg-white/5'}`}
                 >
                   <td className="px-6 py-4 text-gray-300 font-medium">
@@ -107,13 +142,17 @@ export default function JournalClient({ initialTrades }: { initialTrades: Trade[
       {selectedTrade && (
         <div className="w-1/3 glass-panel rounded-2xl flex flex-col animate-in">
           <div className="p-4 border-b border-white/5 flex items-center justify-between">
-            <h3 className="font-bold text-lg text-white">Edit Trade</h3>
-            <button onClick={() => setSelectedTrade(null)} className="p-1 hover:bg-white/10 rounded-lg transition-colors text-gray-400 hover:text-white">
+            <h3 className="font-bold text-lg text-white">{isEditing ? 'Edit Trade' : 'Trade Details'}</h3>
+            <button onClick={() => { setSelectedTrade(null); setIsEditing(false); }} className="p-1 hover:bg-white/10 rounded-lg transition-colors text-gray-400 hover:text-white">
               <X className="w-5 h-5" />
             </button>
           </div>
           
           <div className="p-4 flex-1 overflow-y-auto">
+            {!isEditing ? (
+              <TradeDetailsView trade={selectedTrade} />
+            ) : (
+              <>
             <div className="flex gap-4 mb-6">
               <div className="flex-1 bg-white/5 p-3 rounded-xl border border-white/5">
                 <p className="text-xs text-gray-400 mb-1">Entry Price</p>
@@ -150,7 +189,7 @@ export default function JournalClient({ initialTrades }: { initialTrades: Trade[
               ) : (
                 <div className="relative border-2 border-dashed border-white/10 rounded-lg p-6 hover:bg-white/5 transition-colors cursor-pointer">
                   <Upload className="w-6 h-6 text-gray-400 mx-auto mb-2" />
-                  <p className="text-sm text-gray-400">Click to upload screenshot</p>
+                  <p className="text-sm text-gray-400">Click to upload or press Cmd+V to paste</p>
                   <input type="file" accept="image/*" className="absolute inset-0 opacity-0 cursor-pointer z-10" onChange={async (e) => {
                     const file = e.target.files?.[0];
                     if (!file) return;
@@ -290,20 +329,122 @@ export default function JournalClient({ initialTrades }: { initialTrades: Trade[
                 />
               </div>
             </form>
+              </>
+            )}
           </div>
           <div className="p-4 border-t border-white/5 bg-black/20">
-            <button 
-              type="submit" 
-              form="edit-trade-form"
-              disabled={isSaving}
-              className="w-full bg-blue-600 hover:bg-blue-500 text-white py-3 rounded-xl font-semibold flex items-center justify-center gap-2 transition-all hover-lift disabled:opacity-50"
-            >
-              <Save className="w-5 h-5" />
-              {isSaving ? 'Saving...' : 'Save Updates'}
-            </button>
+            {!isEditing ? (
+              <button 
+                onClick={() => setIsEditing(true)}
+                className="w-full bg-white/10 hover:bg-white/20 text-white py-3 rounded-xl font-semibold flex items-center justify-center gap-2 transition-all hover-lift"
+              >
+                <Edit3 className="w-5 h-5" />
+                Edit Trade
+              </button>
+            ) : (
+              <div className="flex gap-2">
+                <button 
+                  onClick={() => setIsEditing(false)}
+                  className="flex-1 bg-white/5 hover:bg-white/10 text-white py-3 rounded-xl font-semibold transition-all"
+                >
+                  Cancel
+                </button>
+                <button 
+                  type="submit" 
+                  form="edit-trade-form"
+                  disabled={isSaving}
+                  className="flex-1 bg-blue-600 hover:bg-blue-500 text-white py-3 rounded-xl font-semibold flex items-center justify-center gap-2 transition-all disabled:opacity-50"
+                >
+                  <Save className="w-5 h-5" />
+                  {isSaving ? 'Saving...' : 'Save Updates'}
+                </button>
+              </div>
+            )}
           </div>
         </div>
       )}
     </div>
   );
 }
+
+function TradeDetailsView({ trade }: { trade: Trade }) {
+  return (
+    <div className="space-y-6 animate-in">
+      {/* Screenshot */}
+      <div className="rounded-xl overflow-hidden bg-black/50 border border-white/5">
+        {trade.screenshots ? (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img src={trade.screenshots} alt="Trade Screenshot" className="w-full h-auto object-cover" />
+        ) : (
+          <div className="p-10 text-center text-gray-500">
+            <Upload className="w-8 h-8 mx-auto mb-2 opacity-50" />
+            <p className="text-sm">No screenshot uploaded</p>
+          </div>
+        )}
+      </div>
+
+      <div className="flex gap-4">
+        <div className="flex-1 bg-white/5 p-3 rounded-xl border border-white/5">
+          <p className="text-xs text-gray-400 mb-1">Entry Price</p>
+          <p className="font-mono text-white">{trade.entryPrice}</p>
+        </div>
+        <Activity className="w-5 h-5 text-gray-500 my-auto" />
+        <div className="flex-1 bg-white/5 p-3 rounded-xl border border-white/5">
+          <p className="text-xs text-gray-400 mb-1">Exit Price</p>
+          <p className="font-mono text-white">{trade.exitPrice}</p>
+        </div>
+      </div>
+
+      {/* Grid of stats */}
+      <div className="grid grid-cols-2 gap-3">
+        <StatBox label="Setup" value={trade.setup || '-'} />
+        <StatBox label="Session" value={trade.session || '-'} />
+        <StatBox label="Timeframe" value={trade.timeframe || '-'} />
+        <StatBox label="Grade" value={trade.grade || '-'} />
+        <StatBox label="HTF Bias" value={trade.htfBias || '-'} />
+        <StatBox label="SMT" value={trade.smtType || '-'} />
+      </div>
+
+      <div className="grid grid-cols-2 gap-3">
+        <StatBox label="Planned R:R" value={trade.plannedRr ? trade.plannedRr.toString() : '-'} />
+        <StatBox label="Result R:R" value={trade.resultRr ? trade.resultRr.toString() : '-'} />
+        <StatBox label="MFE" value={trade.mfe ? trade.mfe.toString() : '-'} />
+        <StatBox label="MAE" value={trade.mae ? trade.mae.toString() : '-'} />
+      </div>
+
+      <div className="space-y-2">
+        <h4 className="text-sm font-semibold text-gray-400 uppercase">Analysis & Notes</h4>
+        <div className="bg-white/5 p-4 rounded-xl border border-white/5 space-y-3">
+          <div>
+            <span className="text-xs text-gray-500">Emotional State</span>
+            <p className="text-sm text-white font-medium">{trade.emotionalState || '-'}</p>
+          </div>
+          <div>
+            <span className="text-xs text-gray-500">Rules Followed?</span>
+            <p className="text-sm text-white font-medium">{trade.rulesFollowed ? '✅ Yes' : '❌ No'}</p>
+          </div>
+          {!trade.rulesFollowed && trade.ruleBroken && (
+            <div>
+              <span className="text-xs text-gray-500 text-red-400">Rule Broken</span>
+              <p className="text-sm text-white font-medium">{trade.ruleBroken}</p>
+            </div>
+          )}
+          <div>
+            <span className="text-xs text-gray-500">Notes</span>
+            <p className="text-sm text-white whitespace-pre-wrap">{trade.notes || '-'}</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function StatBox({ label, value }: { label: string, value: string }) {
+  return (
+    <div className="bg-white/5 p-3 rounded-xl border border-white/5">
+      <p className="text-xs text-gray-500 uppercase font-medium">{label}</p>
+      <p className="font-semibold text-white mt-1">{value}</p>
+    </div>
+  );
+}
+

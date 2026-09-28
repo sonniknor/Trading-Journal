@@ -107,7 +107,7 @@ export default function DashboardClient({
               <Tooltip 
                 contentStyle={{ backgroundColor: 'rgba(17, 24, 39, 0.9)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '8px' }}
                 itemStyle={{ color: '#fff' }}
-                formatter={(value: number) => [`$${value.toFixed(2)}`, 'PnL']}
+                formatter={(value: any) => [`$${Number(value).toFixed(2)}`, 'PnL']}
               />
               <Area 
                 type="monotone" 
