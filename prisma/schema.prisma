@@ -1,0 +1,44 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model Trade {
+  id              String   @id @default(cuid())
+  
+  // A. Automatic data (from CSV)
+  symbol          String
+  direction       String   // "Long" or "Short"
+  entryTime       DateTime
+  exitTime        DateTime
+  entryPrice      Float
+  exitPrice       Float
+  pnl             Float
+  qty             Int
+  tickSize        Float
+
+  // B. Manual input
+  timeframe       String?  // e.g. "15m/1m", "1h/5m", etc.
+  setup           String?
+  htfBias         String?  // "Pro-trend" or "Counter-trend"
+  smtType         String?  // e.g. "ES/NQ"
+  session         String?  // "London", "NY AM", "NY PM", "Macro"
+  newsCatalyst    Boolean  @default(false)
+  plannedRr       Float?
+  resultRr        Float?
+  mfe             Int?     // Ticks or points
+  mae             Int?     // Ticks or points
+  grade           String?  // "A", "B", "C", "D"
+  rulesFollowed   Boolean?
+  ruleBroken      String?
+  emotionalState  String?  // "Rolig", "Tilted", "FOMO", etc.
+  notes           String?
+  screenshots     String?  // Comma separated URLs or JSON array string
+
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+}
