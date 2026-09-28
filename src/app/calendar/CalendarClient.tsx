@@ -45,8 +45,8 @@ export default function CalendarClient({ trades }: { trades: Trade[] }) {
   const monthEnd = endOfMonth(monthStart);
   
   // start week on Monday
-  const startDate = startOfWeek(monthStart, { weekStarts: 1 });
-  const endDate = endOfWeek(monthEnd, { weekStarts: 1 });
+  const startDate = startOfWeek(monthStart, { weekStartsOn: 1 });
+  const endDate = endOfWeek(monthEnd, { weekStartsOn: 1 });
   
   const days = eachDayOfInterval({ start: startDate, end: endDate });
 

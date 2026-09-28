@@ -3,8 +3,8 @@
 import { useState } from 'react';
 import { format } from 'date-fns';
 import { Trade } from '@prisma/client';
-import { updateTrade } from '@/app/actions';
-import { X, Save, ArrowRight, Activity, Clock } from 'lucide-react';
+import { updateTrade, uploadScreenshot } from '@/app/actions';
+import { X, Save, ArrowRight, Activity, Clock, Upload } from 'lucide-react';
 
 export default function JournalClient({ initialTrades }: { initialTrades: Trade[] }) {
   const [trades, setTrades] = useState<Trade[]>(initialTrades);
@@ -126,6 +126,48 @@ export default function JournalClient({ initialTrades }: { initialTrades: Trade[
               </div>
             </div>
 
+            <div className="mb-6 bg-white/5 p-4 rounded-xl border border-white/5 text-center">
+              {selectedTrade.screenshots ? (
+                <div className="relative group rounded-lg overflow-hidden h-32 bg-black">
+                  <img src={selectedTrade.screenshots} className="w-full h-full object-cover opacity-80" alt="Trade Screenshot" />
+                  <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity">
+                    <p className="text-white text-xs font-semibold">Endre Bilde</p>
+                  </div>
+                  <input type="file" accept="image/*" className="absolute inset-0 opacity-0 cursor-pointer z-10" onChange={async (e) => {
+                    const file = e.target.files?.[0];
+                    if (!file) return;
+                    setIsSaving(true);
+                    const fd = new FormData();
+                    fd.append('file', file);
+                    const res = await uploadScreenshot(selectedTrade.id, fd);
+                    if (res.success && res.data) {
+                      setTrades(trades.map(t => t.id === selectedTrade.id ? { ...t, screenshots: res.data.screenshots } : t));
+                      setSelectedTrade({ ...selectedTrade, screenshots: res.data.screenshots });
+                    }
+                    setIsSaving(false);
+                  }} />
+                </div>
+              ) : (
+                <div className="relative border-2 border-dashed border-white/10 rounded-lg p-6 hover:bg-white/5 transition-colors cursor-pointer">
+                  <Upload className="w-6 h-6 text-gray-400 mx-auto mb-2" />
+                  <p className="text-sm text-gray-400">Klikk for å laste opp skjermbilde</p>
+                  <input type="file" accept="image/*" className="absolute inset-0 opacity-0 cursor-pointer z-10" onChange={async (e) => {
+                    const file = e.target.files?.[0];
+                    if (!file) return;
+                    setIsSaving(true);
+                    const fd = new FormData();
+                    fd.append('file', file);
+                    const res = await uploadScreenshot(selectedTrade.id, fd);
+                    if (res.success && res.data) {
+                      setTrades(trades.map(t => t.id === selectedTrade.id ? { ...t, screenshots: res.data.screenshots } : t));
+                      setSelectedTrade({ ...selectedTrade, screenshots: res.data.screenshots });
+                    }
+                    setIsSaving(false);
+                  }} />
+                </div>
+              )}
+            </div>
+
             <form id="edit-trade-form" onSubmit={handleUpdate} className="space-y-4">
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-1">
@@ -143,10 +185,11 @@ export default function JournalClient({ initialTrades }: { initialTrades: Trade[
                   <label className="text-xs text-gray-400 uppercase font-semibold">Setup</label>
                   <select name="setup" defaultValue={selectedTrade.setup || ""} className="w-full bg-black/50 border border-white/10 rounded-lg p-2 text-white focus:outline-none focus:border-blue-500">
                     <option value="">Velg setup...</option>
-                    <option value="2022 Mentorship">2022 Mentorship</option>
-                    <option value="Silver Bullet">Silver Bullet</option>
-                    <option value="MMXM">MMXM</option>
-                    <option value="Breaker Block">Breaker Block</option>
+                    <option value="Orderblock">Orderblock</option>
+                    <option value="Breakerblock">Breakerblock</option>
+                    <option value="FVG">FVG</option>
+                    <option value="IFVG">IFVG</option>
+                    <option value="CSD">CSD</option>
                   </select>
                 </div>
                 
@@ -154,10 +197,11 @@ export default function JournalClient({ initialTrades }: { initialTrades: Trade[
                   <label className="text-xs text-gray-400 uppercase font-semibold">Session</label>
                   <select name="session" defaultValue={selectedTrade.session || ""} className="w-full bg-black/50 border border-white/10 rounded-lg p-2 text-white focus:outline-none focus:border-blue-500">
                     <option value="">Velg session...</option>
-                    <option value="London">London</option>
                     <option value="NY AM">NY AM</option>
                     <option value="NY PM">NY PM</option>
-                    <option value="Macro">Macro</option>
+                    <option value="London">London</option>
+                    <option value="Asia">Asia</option>
+                    <option value="Out of session">Out of session</option>
                   </select>
                 </div>
 

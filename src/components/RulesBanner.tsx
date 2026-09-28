@@ -9,28 +9,16 @@ export default async function RulesBanner() {
   // Sorter trades kronologisk (nyeste først)
   const sortedTrades = [...trades].sort((a, b) => new Date(b.entryTime).getTime() - new Date(a.entryTime).getTime());
   
-  // Finn nyeste dato som har trades (i tilfelle "i dag" ikke har trades, kan vi sjekke siste aktive dag)
-  // Men for regler er det best å sjekke "I dag". For demo-formål sjekker vi den siste aktive dagen hvis "i dag" ikke har trades.
-  const latestDate = new Date(sortedTrades[0].entryTime);
-  const tradesToday = sortedTrades.filter(t => isSameDay(new Date(t.entryTime), latestDate));
+  // Evaluere regler basert på faktisk dag i dag
+  const today = new Date();
+  const tradesToday = sortedTrades.filter(t => isSameDay(new Date(t.entryTime), today));
   
   // Regel 1 & 2: Tap i dag
-  let consecutiveLossesToday = 0;
-  for (const t of tradesToday) {
-    if (t.pnl < 0) {
-      consecutiveLossesToday++;
-    } else if (t.pnl > 0) {
-      // Hvis de har en vinner, bryter det rekken? "Maksimalt 2 tap pr dag" betyr kanskje totalt 2 tap uansett rekke.
-      // La oss telle totalt antall tap i dag.
-    }
-  }
-  
   const totalLossesToday = tradesToday.filter(t => t.pnl <= -50).length;
-  const lastTradeToday = tradesToday[0]; // Siden den er sortert nyest først
   
   // Regel 3: Maks 2 røde dager pr uke
-  // Finn alle dager i samme uke som latestDate
-  const tradesThisWeek = sortedTrades.filter(t => isSameWeek(new Date(t.entryTime), latestDate, { weekStarts: 1 }));
+  // Finn alle dager i denne kalenderuken
+  const tradesThisWeek = sortedTrades.filter(t => isSameWeek(new Date(t.entryTime), today, { weekStartsOn: 1 }));
   const dailyPnLThisWeek: Record<string, number> = {};
   tradesThisWeek.forEach(t => {
     const day = startOfDay(new Date(t.entryTime)).toISOString();
@@ -38,8 +26,9 @@ export default async function RulesBanner() {
   });
   const redDaysThisWeek = Object.values(dailyPnLThisWeek).filter(pnl => pnl <= -50).length;
 
-  // Regel 4: SMT må være tilstede
-  const isSmtMissing = lastTradeToday && !lastTradeToday.smtType;
+  // Regel 4: SMT må være tilstede (sjekker bare den aller siste traden totalt, uavhengig av dag)
+  const lastTradeEver = sortedTrades[0];
+  const isSmtMissing = lastTradeEver && !lastTradeEver.smtType;
 
   // Evaluer hvilke advarsler som skal vises (mest alvorlig først)
   let alerts = [];

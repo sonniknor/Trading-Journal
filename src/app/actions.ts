@@ -55,3 +55,35 @@ export async function updateTrade(id: string, data: Partial<Prisma.TradeUpdateIn
     return { success: false, error: error.message };
   }
 }
+
+import { writeFile } from 'fs/promises';
+import { join } from 'path';
+
+export async function uploadScreenshot(tradeId: string, formData: FormData) {
+  try {
+    const file = formData.get('file') as File | null;
+    if (!file) {
+      return { success: false, error: 'Ingen fil funnet' };
+    }
+
+    const bytes = await file.arrayBuffer();
+    const buffer = Buffer.from(bytes);
+
+    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9);
+    const filename = `${uniqueSuffix}-${file.name.replace(/\s+/g, '_')}`;
+    const publicPath = `/uploads/${filename}`;
+    const dest = join(process.cwd(), 'public', 'uploads', filename);
+    
+    await writeFile(dest, buffer);
+
+    const updated = await prisma.trade.update({
+      where: { id: tradeId },
+      data: { screenshots: publicPath }
+    });
+
+    return { success: true, data: updated };
+  } catch (error: any) {
+    console.error("Error uploading file:", error);
+    return { success: false, error: error.message };
+  }
+}
