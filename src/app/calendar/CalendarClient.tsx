@@ -15,7 +15,7 @@ import {
   endOfWeek,
   isToday
 } from 'date-fns';
-import { nb } from 'date-fns/locale';
+import { enUS } from 'date-fns/locale';
 import { ChevronLeft, ChevronRight, TrendingUp, TrendingDown, Target } from 'lucide-react';
 
 export default function CalendarClient({ trades }: { trades: Trade[] }) {
@@ -64,7 +64,7 @@ export default function CalendarClient({ trades }: { trades: Trade[] }) {
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <div className="glass-panel p-5 rounded-2xl flex items-center justify-between">
           <div>
-            <p className="text-sm text-gray-400 font-medium mb-1">Månedlig PnL</p>
+            <p className="text-sm text-gray-400 font-medium mb-1">Monthly PnL</p>
             <p className={`text-2xl font-bold ${monthlyPnL >= 0 ? 'text-green-400' : 'text-red-400'}`}>
               ${monthlyPnL.toFixed(2)}
             </p>
@@ -76,7 +76,7 @@ export default function CalendarClient({ trades }: { trades: Trade[] }) {
 
         <div className="glass-panel p-5 rounded-2xl flex items-center justify-between">
           <div>
-            <p className="text-sm text-gray-400 font-medium mb-1">Grønne Dager</p>
+            <p className="text-sm text-gray-400 font-medium mb-1">Green Days</p>
             <p className="text-2xl font-bold text-white">{winningDays}</p>
           </div>
           <div className="p-3 bg-blue-500/10 rounded-xl">
@@ -86,7 +86,7 @@ export default function CalendarClient({ trades }: { trades: Trade[] }) {
 
         <div className="glass-panel p-5 rounded-2xl flex items-center justify-between">
           <div>
-            <p className="text-sm text-gray-400 font-medium mb-1">Røde Dager</p>
+            <p className="text-sm text-gray-400 font-medium mb-1">Red Days</p>
             <p className="text-2xl font-bold text-white">{losingDays}</p>
           </div>
           <div className="p-3 bg-purple-500/10 rounded-xl">
@@ -99,14 +99,14 @@ export default function CalendarClient({ trades }: { trades: Trade[] }) {
       <div className="glass-panel rounded-2xl p-6">
         <div className="flex items-center justify-between mb-8">
           <h2 className="text-2xl font-bold text-white capitalize">
-            {format(currentDate, 'MMMM yyyy', { locale: nb })}
+            {format(currentDate, 'MMMM yyyy', { locale: enUS })}
           </h2>
           <div className="flex gap-2">
             <button onClick={prevMonth} className="p-2 rounded-xl hover:bg-white/10 text-gray-400 hover:text-white transition-colors">
               <ChevronLeft className="w-5 h-5" />
             </button>
             <button onClick={() => setCurrentDate(new Date())} className="px-4 py-2 text-sm font-medium rounded-xl hover:bg-white/10 text-gray-300 transition-colors">
-              I dag
+              Today
             </button>
             <button onClick={nextMonth} className="p-2 rounded-xl hover:bg-white/10 text-gray-400 hover:text-white transition-colors">
               <ChevronRight className="w-5 h-5" />
@@ -116,7 +116,7 @@ export default function CalendarClient({ trades }: { trades: Trade[] }) {
 
         <div className="grid grid-cols-7 gap-4">
           {/* Weekday headers */}
-          {['Man', 'Tir', 'Ons', 'Tor', 'Fre', 'Lør', 'Søn'].map(day => (
+          {['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'].map(day => (
             <div key={day} className="text-center text-sm font-semibold text-gray-500 mb-2">
               {day}
             </div>

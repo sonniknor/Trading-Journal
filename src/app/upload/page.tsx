@@ -17,7 +17,7 @@ export default function UploadPage() {
     if (!selectedFile) return;
     
     if (!selectedFile.name.endsWith('.csv')) {
-      setError('Vennligst last opp en gyldig CSV-fil.');
+      setError('Please upload a valid CSV file.');
       return;
     }
     
@@ -45,11 +45,11 @@ export default function UploadPage() {
     const result = await saveTrades(parsedTrades);
     
     if (result.success) {
-      alert(`Suksess! ${result.count} trades ble lagret.`);
+      alert(`Success! ${result.count} trades were saved.`);
       setParsedTrades([]);
       setFile(null);
     } else {
-      setError(result.error || 'Noe gikk galt under lagring');
+      setError(result.error || 'Something went wrong during saving');
     }
     setIsUploading(false);
   };
@@ -57,8 +57,8 @@ export default function UploadPage() {
   return (
     <div className="max-w-4xl mx-auto space-y-8 animate-in">
       <header>
-        <h1 className="text-3xl font-bold text-white mb-2">Importer Trades</h1>
-        <p className="text-gray-400">Last opp CSV-eksport fra Tradovate for å automatisk loggføre dine utførelser.</p>
+        <h1 className="text-3xl font-bold text-white mb-2">Import Trades</h1>
+        <p className="text-gray-400">Upload CSV export from Tradovate to automatically log your executions.</p>
       </header>
 
       <div className="glass-panel p-8 rounded-3xl border-dashed border-2 border-white/10 hover:border-blue-500/50 transition-colors relative overflow-hidden group">
@@ -74,14 +74,14 @@ export default function UploadPage() {
             <UploadCloud className="w-8 h-8 text-blue-400" />
           </div>
           <div>
-            <h3 className="text-xl font-semibold text-white mb-1">Dra og slipp CSV-fil her</h3>
-            <p className="text-sm text-gray-400">eller klikk for å velge fil fra datamaskinen</p>
+            <h3 className="text-xl font-semibold text-white mb-1">Drag and drop CSV file here</h3>
+            <p className="text-sm text-gray-400">or click to select file from your computer</p>
           </div>
           
           {file && !error && (
             <div className="flex items-center gap-2 text-green-400 bg-green-500/10 px-4 py-2 rounded-full text-sm font-medium">
               <CheckCircle className="w-4 h-4" />
-              {file.name} valgt
+              {file.name} selected
             </div>
           )}
           
@@ -100,14 +100,14 @@ export default function UploadPage() {
           <div className="flex items-center justify-between">
             <h2 className="text-xl font-semibold text-white flex items-center gap-2">
               <FileText className="w-5 h-5 text-purple-400" />
-              Forhåndsvisning ({parsedTrades.length} trades)
+              Preview ({parsedTrades.length} trades)
             </h2>
             <button 
               onClick={handleSave}
               disabled={isUploading}
               className="bg-blue-600 hover:bg-blue-500 text-white px-6 py-2 rounded-xl font-medium transition-all disabled:opacity-50 hover-lift"
             >
-              {isUploading ? 'Lagrer...' : 'Lagre til Journal'}
+              {isUploading ? 'Saving...' : 'Save to Journal'}
             </button>
           </div>
           
@@ -117,8 +117,8 @@ export default function UploadPage() {
                 <thead className="text-xs text-gray-400 bg-white/5 uppercase">
                   <tr>
                     <th className="px-6 py-4">Symbol</th>
-                    <th className="px-6 py-4">Retning</th>
-                    <th className="px-6 py-4">Entry Tid</th>
+                    <th className="px-6 py-4">Direction</th>
+                    <th className="px-6 py-4">Entry Time</th>
                     <th className="px-6 py-4">PnL</th>
                   </tr>
                 </thead>
@@ -143,7 +143,7 @@ export default function UploadPage() {
               </table>
               {parsedTrades.length > 5 && (
                 <div className="p-4 text-center text-sm text-gray-400 bg-white/5">
-                  Viser 5 av {parsedTrades.length} trades
+                  Showing 5 of {parsedTrades.length} trades
                 </div>
               )}
             </div>

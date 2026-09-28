@@ -36,22 +36,22 @@ export default async function RulesBanner() {
   if (redDaysThisWeek >= 2) {
     alerts.push({
       level: 'critical',
-      title: 'Maks røde dager nådd!',
-      message: 'Du har allerede 2 røde dager denne uken (Regel 3). Skru av skjermen og ta fri resten av uken for å beskytte kapitalen.',
+      title: 'Max red days reached!',
+      message: 'You already have 2 red days this week (Rule 3). Step away and take the rest of the week off to protect your capital.',
       icon: XCircle
     });
   } else if (totalLossesToday >= 2) {
     alerts.push({
       level: 'critical',
-      title: 'Dagsgrense nådd!',
-      message: 'Du har nådd 2 tap i dag (Regel 1). Mental UI er låst. Vennligst stopp tradingen for i dag.',
+      title: 'Daily limit reached!',
+      message: 'You have hit 2 losses today (Rule 1). Mental UI is locked. Please stop trading for today.',
       icon: XCircle
     });
   } else if (totalLossesToday === 1) {
     alerts.push({
       level: 'warning',
-      title: 'Forsiktig: 1 Tap i dag',
-      message: 'Du har 1 tap i dag. Din neste trade må være med HALV risiko (Regel 2). Husk at neste tap er ditt siste for dagen.',
+      title: 'Caution: 1 Loss today',
+      message: 'You have 1 loss today. Your next trade must be with HALF risk (Rule 2). Remember that your next loss is your last for the day.',
       icon: AlertTriangle
     });
   }
@@ -59,8 +59,8 @@ export default async function RulesBanner() {
   if (isSmtMissing) {
     alerts.push({
       level: 'warning',
-      title: 'Regelbrudd oppdaget',
-      message: 'Din forrige trade mangler SMT-bekreftelse (Regel 4). Sørg for at du følger systemet!',
+      title: 'Rule violation detected',
+      message: 'Your previous trade is missing SMT confirmation (Rule 4). Make sure you follow the system!',
       icon: ShieldAlert
     });
   }

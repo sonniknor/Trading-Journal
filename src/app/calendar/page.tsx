@@ -9,8 +9,8 @@ export default async function CalendarPage() {
   return (
     <div className="animate-in space-y-6">
       <header>
-        <h1 className="text-3xl font-bold text-white mb-2">Trading Kalender</h1>
-        <p className="text-gray-400">Få et visuelt overblikk over dine grønne og røde dager denne måneden.</p>
+        <h1 className="text-3xl font-bold text-white mb-2">Trading Calendar</h1>
+        <p className="text-gray-400">Get a visual overview of your green and red days this month.</p>
       </header>
       
       <CalendarClient trades={trades} />

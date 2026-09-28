@@ -20,9 +20,9 @@ export function cn(...inputs: (string | undefined | null | false)[]) {
 const navItems = [
   { name: 'Dashboard', href: '/', icon: LayoutDashboard },
   { name: 'Journal', href: '/journal', icon: BookOpen },
-  { name: 'Kalender', href: '/calendar', icon: CalendarDays },
+  { name: 'Calendar', href: '/calendar', icon: CalendarDays },
   { name: 'Playbook', href: '/playbook', icon: ImageIcon },
-  { name: 'Last opp', href: '/upload', icon: Upload },
+  { name: 'Upload', href: '/upload', icon: Upload },
 ];
 
 export function Sidebar() {
@@ -66,7 +66,7 @@ export function Sidebar() {
       <div className="mt-auto">
         <button className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-gray-400 hover:text-white hover:bg-white/5 transition-all w-full text-left">
           <Settings className="w-5 h-5" />
-          <span className="font-medium text-sm">Innstillinger</span>
+          <span className="font-medium text-sm">Settings</span>
         </button>
       </div>
     </div>

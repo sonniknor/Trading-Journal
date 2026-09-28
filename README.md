@@ -1,72 +1,72 @@
 # Trading Journal Pro 📈
 
-En webbasert, profesjonell Trading Journal bygget for **Index Futures** og spesifikt skreddersydd for tradere som benytter seg av **SMC / ICT** konsepter. Appen fungerer både som en komplett logg, et analyseverktøy for å finne "edge", og en digital disiplin-vaktbikkje.
+A web-based, professional Trading Journal built for **Index Futures** and specifically tailored for traders utilizing **SMC / ICT** concepts. The app serves as a comprehensive log, an analytical tool to find your edge, and a digital discipline enforcer.
 
-Bygget med **Next.js 15**, **React**, **Tailwind CSS**, **Prisma** og **SQLite**.
+Built with **Next.js 15**, **React**, **Tailwind CSS**, **Prisma**, and **SQLite**.
 
 ---
 
-## 🎯 Nøkkelfunksjoner
+## 🎯 Key Features
 
-- **Sømløs Tradovate Integrasjon**: Dra og slipp Tradovate CSV-eksporten din rett inn i appen. Parseren håndterer tidsstempler, formatering og PnL automatisk.
-- **Premium Dashboard**: Interaktiv Equity Curve (Recharts) og KPIer som Win Rate, Profit Factor, Current Drawdown og Net PnL. *(Trades under $50 filtreres som Break Even).*
-- **Kalendervisning (Heatmap)**: Få rask oversikt over månedens ytelse med fargekodede dager (Grønn, Rød eller Grå for Break Even).
-- **Avansert Journalføring**: Suppler automatisk data med manuelle parametere:
+- **Seamless Tradovate Integration**: Drag and drop your Tradovate CSV export directly into the app. The parser handles timestamps, formatting, and PnL automatically.
+- **Premium Dashboard**: Interactive Equity Curve (Recharts) and KPIs such as Win Rate, Profit Factor, Current Drawdown, and Net PnL. *(Trades under $50 are filtered as Break Even).*
+- **Calendar View (Heatmap)**: Get a quick overview of your monthly performance with color-coded days (Green, Red, or Gray for Break Even).
+- **Advanced Journaling**: Supplement automated data with manual parameters:
   - Setups (Orderblock, Breakerblock, FVG, IFVG, CSD)
-  - Timeframe kombinasjoner
+  - Timeframe combinations
   - HTF Bias (Pro/Counter-trend)
   - SMT Divergence
   - MFE / MAE & Planned R:R
-  - Emosjonell tilstand & Karakter (Grade)
-- **Bildeopplasting**: Last opp skjermbilder av grafene/utførelsen direkte i journalen din.
-- **Playbook Galleri**: Et eksklusivt, visuelt bibliotek som automatisk samler alle trades du har markert med karakteren "A". Perfekt for tape-reading og mønstergjenkjenning!
-- **Rules Engine (Disiplin-vaktbikkje)**: Overvåker tradingen din i sanntid og gir visuelle, fargekodede advarsler hvis du bryter reglene dine:
-  - Maks 2 tap per dag (Låser mentalt UI).
-  - Halv risiko-varsel etter 1 tap.
-  - Maks 2 røde dager per uke.
-  - Varsel ved manglende SMT-bekreftelse.
+  - Emotional state & Grade
+- **Image Uploads**: Upload screenshots of your charts/execution directly into your journal.
+- **Playbook Gallery**: An exclusive, visual library that automatically collects all trades you've graded as "A". Perfect for tape-reading and pattern recognition!
+- **Rules Engine (Discipline Enforcer)**: Monitors your trading in real-time and provides visual, color-coded warnings if you break your rules:
+  - Max 2 losses per day (Mentally locks UI).
+  - Half-risk warning after 1 loss.
+  - Max 2 red days per week.
+  - Warning for missing SMT confirmation.
 
 ---
 
-## 🚀 Kom i gang (Lokal Installasjon)
+## 🚀 Getting Started (Local Installation)
 
-Siden appen bruker en lokal SQLite-database, kjører alt trygt og raskt på din egen maskin uten at finansiell data forlater datamaskinen din.
+Since the app uses a local SQLite database, everything runs securely and quickly on your own machine without financial data leaving your computer.
 
-### 1. Klon prosjektet og installer avhengigheter
+### 1. Clone the project and install dependencies
 ```bash
-git clone <din-repo-url>
+git clone https://github.com/sonniknor/Trading-Journal.git
 cd journal
 npm install
 ```
 
-### 2. Sett opp databasen (Prisma + SQLite)
-Dette vil generere Prisma-klienten og opprette den lokale `dev.db` filen (som git ignorerer automatisk).
+### 2. Set up the database (Prisma + SQLite)
+This will generate the Prisma client and create the local `dev.db` file (which git ignores automatically).
 ```bash
 npx prisma db push
 ```
 
-### 3. Start utviklingsserveren
+### 3. Start the development server
 ```bash
 npm run dev
 ```
 
-Åpne [http://localhost:3000](http://localhost:3000) i nettleseren din for å se applikasjonen.
+Open [http://localhost:3000](http://localhost:3000) in your browser to view the application.
 
 ---
 
-## 📂 Brukerveiledning
+## 📂 User Guide
 
-1. Eksporter tradinghistorikken din fra Tradovate i `.csv`-format.
-2. Gå til fanen **Opplasting** og dra filen inn i slippsonen for å populere databasen.
-3. Gå til **Journal**, klikk på en trade for å åpne sidepanelet, og fyll ut detaljene for strategien din (setup, session, skjermbilde, notater).
-4. Sjekk **Dashboard** og **Kalender** for å analysere resultatene dine over tid.
-5. Bruk **Playbook** for å studere "A"-setups.
+1. Export your trading history from Tradovate in `.csv` format.
+2. Go to the **Upload** tab and drag the file into the dropzone to populate the database.
+3. Go to **Journal**, click on a trade to open the side panel, and fill in the details for your strategy (setup, session, screenshot, notes).
+4. Check the **Dashboard** and **Calendar** to analyze your results over time.
+5. Use the **Playbook** to study your "A" setups.
 
 ---
 
-## 🛠️ Teknologistakk
+## 🛠️ Tech Stack
 - **Frontend**: Next.js 15 (App Router), React, Tailwind CSS, Recharts, Lucide Icons, Date-fns.
 - **Backend / Database**: Server Actions, Prisma ORM, SQLite.
 - **Design**: Dark Mode Glassmorphism UI.
 
-*Utviklet med fokus på kapitalbevaring og disiplin.*
+*Developed with a focus on capital preservation and discipline.*

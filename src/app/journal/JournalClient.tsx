@@ -40,7 +40,7 @@ export default function JournalClient({ initialTrades }: { initialTrades: Trade[
       setTrades(trades.map(t => t.id === selectedTrade.id ? { ...t, ...data } : t));
       setSelectedTrade(null);
     } else {
-      alert("Feil ved lagring av trade.");
+      alert("Error saving trade.");
     }
     setIsSaving(false);
   };
@@ -53,9 +53,9 @@ export default function JournalClient({ initialTrades }: { initialTrades: Trade[
           <table className="w-full text-sm text-left relative">
             <thead className="text-xs text-gray-400 bg-white/5 uppercase sticky top-0 z-10 backdrop-blur-md">
               <tr>
-                <th className="px-6 py-4">Dato & Tid</th>
+                <th className="px-6 py-4">Date & Time</th>
                 <th className="px-6 py-4">Symbol</th>
-                <th className="px-6 py-4">Retning</th>
+                <th className="px-6 py-4">Direction</th>
                 <th className="px-6 py-4">PnL</th>
                 <th className="px-6 py-4">Setup</th>
                 <th className="px-6 py-4">Grade</th>
@@ -94,7 +94,7 @@ export default function JournalClient({ initialTrades }: { initialTrades: Trade[
               {trades.length === 0 && (
                 <tr>
                   <td colSpan={6} className="px-6 py-12 text-center text-gray-500">
-                    Ingen trades funnet. Gå til Opplasting for å importere.
+                    No trades found. Go to Upload to import.
                   </td>
                 </tr>
               )}
@@ -107,7 +107,7 @@ export default function JournalClient({ initialTrades }: { initialTrades: Trade[
       {selectedTrade && (
         <div className="w-1/3 glass-panel rounded-2xl flex flex-col animate-in">
           <div className="p-4 border-b border-white/5 flex items-center justify-between">
-            <h3 className="font-bold text-lg text-white">Rediger Trade</h3>
+            <h3 className="font-bold text-lg text-white">Edit Trade</h3>
             <button onClick={() => setSelectedTrade(null)} className="p-1 hover:bg-white/10 rounded-lg transition-colors text-gray-400 hover:text-white">
               <X className="w-5 h-5" />
             </button>
@@ -116,12 +116,12 @@ export default function JournalClient({ initialTrades }: { initialTrades: Trade[
           <div className="p-4 flex-1 overflow-y-auto">
             <div className="flex gap-4 mb-6">
               <div className="flex-1 bg-white/5 p-3 rounded-xl border border-white/5">
-                <p className="text-xs text-gray-400 mb-1">Entry Pris</p>
+                <p className="text-xs text-gray-400 mb-1">Entry Price</p>
                 <p className="font-mono text-white">{selectedTrade.entryPrice}</p>
               </div>
               <Activity className="w-5 h-5 text-gray-500 my-auto" />
               <div className="flex-1 bg-white/5 p-3 rounded-xl border border-white/5">
-                <p className="text-xs text-gray-400 mb-1">Exit Pris</p>
+                <p className="text-xs text-gray-400 mb-1">Exit Price</p>
                 <p className="font-mono text-white">{selectedTrade.exitPrice}</p>
               </div>
             </div>
@@ -131,7 +131,7 @@ export default function JournalClient({ initialTrades }: { initialTrades: Trade[
                 <div className="relative group rounded-lg overflow-hidden h-32 bg-black">
                   <img src={selectedTrade.screenshots} className="w-full h-full object-cover opacity-80" alt="Trade Screenshot" />
                   <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity">
-                    <p className="text-white text-xs font-semibold">Endre Bilde</p>
+                    <p className="text-white text-xs font-semibold">Change Image</p>
                   </div>
                   <input type="file" accept="image/*" className="absolute inset-0 opacity-0 cursor-pointer z-10" onChange={async (e) => {
                     const file = e.target.files?.[0];
@@ -150,7 +150,7 @@ export default function JournalClient({ initialTrades }: { initialTrades: Trade[
               ) : (
                 <div className="relative border-2 border-dashed border-white/10 rounded-lg p-6 hover:bg-white/5 transition-colors cursor-pointer">
                   <Upload className="w-6 h-6 text-gray-400 mx-auto mb-2" />
-                  <p className="text-sm text-gray-400">Klikk for å laste opp skjermbilde</p>
+                  <p className="text-sm text-gray-400">Click to upload screenshot</p>
                   <input type="file" accept="image/*" className="absolute inset-0 opacity-0 cursor-pointer z-10" onChange={async (e) => {
                     const file = e.target.files?.[0];
                     if (!file) return;
@@ -173,7 +173,7 @@ export default function JournalClient({ initialTrades }: { initialTrades: Trade[
                 <div className="space-y-1">
                   <label className="text-xs text-gray-400 uppercase font-semibold">Timeframe</label>
                   <select name="timeframe" defaultValue={selectedTrade.timeframe || ""} className="w-full bg-black/50 border border-white/10 rounded-lg p-2 text-white focus:outline-none focus:border-blue-500">
-                    <option value="">Velg timeframe...</option>
+                    <option value="">Select timeframe...</option>
                     <option value="4h/15m">4h / 15m</option>
                     <option value="1h/5m">1h / 5m</option>
                     <option value="30m/3m">30m / 3m</option>
@@ -184,7 +184,7 @@ export default function JournalClient({ initialTrades }: { initialTrades: Trade[
                 <div className="space-y-1">
                   <label className="text-xs text-gray-400 uppercase font-semibold">Setup</label>
                   <select name="setup" defaultValue={selectedTrade.setup || ""} className="w-full bg-black/50 border border-white/10 rounded-lg p-2 text-white focus:outline-none focus:border-blue-500">
-                    <option value="">Velg setup...</option>
+                    <option value="">Select setup...</option>
                     <option value="Orderblock">Orderblock</option>
                     <option value="Breakerblock">Breakerblock</option>
                     <option value="FVG">FVG</option>
@@ -196,7 +196,7 @@ export default function JournalClient({ initialTrades }: { initialTrades: Trade[
                 <div className="space-y-1">
                   <label className="text-xs text-gray-400 uppercase font-semibold">Session</label>
                   <select name="session" defaultValue={selectedTrade.session || ""} className="w-full bg-black/50 border border-white/10 rounded-lg p-2 text-white focus:outline-none focus:border-blue-500">
-                    <option value="">Velg session...</option>
+                    <option value="">Select session...</option>
                     <option value="NY AM">NY AM</option>
                     <option value="NY PM">NY PM</option>
                     <option value="London">London</option>
@@ -208,7 +208,7 @@ export default function JournalClient({ initialTrades }: { initialTrades: Trade[
                 <div className="space-y-1">
                   <label className="text-xs text-gray-400 uppercase font-semibold">HTF Bias</label>
                   <select name="htfBias" defaultValue={selectedTrade.htfBias || ""} className="w-full bg-black/50 border border-white/10 rounded-lg p-2 text-white focus:outline-none focus:border-blue-500">
-                    <option value="">Velg bias...</option>
+                    <option value="">Select bias...</option>
                     <option value="Pro-trend">Pro-trend</option>
                     <option value="Counter-trend">Counter-trend</option>
                   </select>
@@ -217,60 +217,60 @@ export default function JournalClient({ initialTrades }: { initialTrades: Trade[
                 <div className="space-y-1">
                   <label className="text-xs text-gray-400 uppercase font-semibold">Grade</label>
                   <select name="grade" defaultValue={selectedTrade.grade || ""} className="w-full bg-black/50 border border-white/10 rounded-lg p-2 text-white focus:outline-none focus:border-blue-500">
-                    <option value="">Karakter...</option>
-                    <option value="A">A - Perfekt</option>
-                    <option value="B">B - Bra</option>
-                    <option value="C">C - Grei</option>
-                    <option value="D">D - Dårlig</option>
+                    <option value="">Grade...</option>
+                    <option value="A">A - Perfect</option>
+                    <option value="B">B - Good</option>
+                    <option value="C">C - Okay</option>
+                    <option value="D">D - Poor</option>
                   </select>
                 </div>
 
                 <div className="space-y-1">
-                  <label className="text-xs text-gray-400 uppercase font-semibold">Planlagt R:R</label>
-                  <input name="plannedRr" type="number" step="0.1" defaultValue={selectedTrade.plannedRr ?? ""} placeholder="F.eks. 3.0" className="w-full bg-black/50 border border-white/10 rounded-lg p-2 text-white focus:outline-none focus:border-blue-500" />
+                  <label className="text-xs text-gray-400 uppercase font-semibold">Planned R:R</label>
+                  <input name="plannedRr" type="number" step="0.1" defaultValue={selectedTrade.plannedRr ?? ""} placeholder="E.g. 3.0" className="w-full bg-black/50 border border-white/10 rounded-lg p-2 text-white focus:outline-none focus:border-blue-500" />
                 </div>
 
                 <div className="space-y-1">
-                  <label className="text-xs text-gray-400 uppercase font-semibold">Resultat i R</label>
-                  <input name="resultRr" type="number" step="0.1" defaultValue={selectedTrade.resultRr ?? ""} placeholder="F.eks. 2.5" className="w-full bg-black/50 border border-white/10 rounded-lg p-2 text-white focus:outline-none focus:border-blue-500" />
+                  <label className="text-xs text-gray-400 uppercase font-semibold">Result in R</label>
+                  <input name="resultRr" type="number" step="0.1" defaultValue={selectedTrade.resultRr ?? ""} placeholder="E.g. 2.5" className="w-full bg-black/50 border border-white/10 rounded-lg p-2 text-white focus:outline-none focus:border-blue-500" />
                 </div>
 
                 <div className="space-y-1">
                   <label className="text-xs text-gray-400 uppercase font-semibold">MFE (Ticks/Pts)</label>
-                  <input name="mfe" type="number" defaultValue={selectedTrade.mfe ?? ""} placeholder="Maks profitt under trade" className="w-full bg-black/50 border border-white/10 rounded-lg p-2 text-white focus:outline-none focus:border-blue-500" />
+                  <input name="mfe" type="number" defaultValue={selectedTrade.mfe ?? ""} placeholder="Max profit during trade" className="w-full bg-black/50 border border-white/10 rounded-lg p-2 text-white focus:outline-none focus:border-blue-500" />
                 </div>
 
                 <div className="space-y-1">
                   <label className="text-xs text-gray-400 uppercase font-semibold">MAE (Ticks/Pts)</label>
-                  <input name="mae" type="number" defaultValue={selectedTrade.mae ?? ""} placeholder="Maks drawdown under trade" className="w-full bg-black/50 border border-white/10 rounded-lg p-2 text-white focus:outline-none focus:border-blue-500" />
+                  <input name="mae" type="number" defaultValue={selectedTrade.mae ?? ""} placeholder="Max drawdown during trade" className="w-full bg-black/50 border border-white/10 rounded-lg p-2 text-white focus:outline-none focus:border-blue-500" />
                 </div>
               </div>
 
               <div className="grid grid-cols-2 gap-4">
                 <label className="flex items-center gap-2 text-sm text-gray-300">
                   <input name="newsCatalyst" type="checkbox" defaultChecked={selectedTrade.newsCatalyst || false} className="rounded bg-black/50 border-white/10 text-blue-500 focus:ring-blue-500" />
-                  Nyhetskatalysator (Ja)
+                  News Catalyst (Yes)
                 </label>
                 <label className="flex items-center gap-2 text-sm text-gray-300">
                   <input name="rulesFollowed" type="checkbox" defaultChecked={selectedTrade.rulesFollowed || false} className="rounded bg-black/50 border-white/10 text-blue-500 focus:ring-blue-500" />
-                  Fulgte alle regler
+                  Followed all rules
                 </label>
               </div>
 
               <div className="space-y-1">
-                <label className="text-xs text-gray-400 uppercase font-semibold">Hvilken regel ble evt. brutt?</label>
-                <input name="ruleBroken" defaultValue={selectedTrade.ruleBroken || ""} placeholder="F.eks. 'Tok trade før 09:30'" className="w-full bg-black/50 border border-white/10 rounded-lg p-2 text-white focus:outline-none focus:border-blue-500" />
+                <label className="text-xs text-gray-400 uppercase font-semibold">Which rule was broken (if any)?</label>
+                <input name="ruleBroken" defaultValue={selectedTrade.ruleBroken || ""} placeholder="E.g. 'Took trade before 09:30'" className="w-full bg-black/50 border border-white/10 rounded-lg p-2 text-white focus:outline-none focus:border-blue-500" />
               </div>
 
               <div className="space-y-1">
-                <label className="text-xs text-gray-400 uppercase font-semibold">Emosjonell Tilstand</label>
+                <label className="text-xs text-gray-400 uppercase font-semibold">Emotional State</label>
                 <select name="emotionalState" defaultValue={selectedTrade.emotionalState || ""} className="w-full bg-black/50 border border-white/10 rounded-lg p-2 text-white focus:outline-none focus:border-blue-500">
-                  <option value="">Hvordan følte du deg?</option>
-                  <option value="Rolig">Rolig og Fokusert</option>
+                  <option value="">How did you feel?</option>
+                  <option value="Rolig">Calm and Focused</option>
                   <option value="FOMO">FOMO</option>
-                  <option value="Stresset">Stresset / Nølende</option>
-                  <option value="Tilted">Tilted / Revansje</option>
-                  <option value="Kjedet meg">Kjedet meg / Overtrading</option>
+                  <option value="Stresset">Stressed / Hesitant</option>
+                  <option value="Tilted">Tilted / Revenge</option>
+                  <option value="Kjedet meg">Bored / Overtrading</option>
                 </select>
               </div>
 
@@ -280,12 +280,12 @@ export default function JournalClient({ initialTrades }: { initialTrades: Trade[
               </div>
 
               <div className="space-y-1">
-                <label className="text-xs text-gray-400 uppercase font-semibold">Notater</label>
+                <label className="text-xs text-gray-400 uppercase font-semibold">Notes</label>
                 <textarea 
                   name="notes" 
                   defaultValue={selectedTrade.notes || ""} 
                   rows={4}
-                  placeholder="Hva gikk bra? Hva kunne vært bedre?"
+                  placeholder="What went well? What could be improved?"
                   className="w-full bg-black/50 border border-white/10 rounded-lg p-3 text-white focus:outline-none focus:border-blue-500 resize-none" 
                 />
               </div>
@@ -299,7 +299,7 @@ export default function JournalClient({ initialTrades }: { initialTrades: Trade[
               className="w-full bg-blue-600 hover:bg-blue-500 text-white py-3 rounded-xl font-semibold flex items-center justify-center gap-2 transition-all hover-lift disabled:opacity-50"
             >
               <Save className="w-5 h-5" />
-              {isSaving ? 'Lagrer...' : 'Lagre Oppdateringer'}
+              {isSaving ? 'Saving...' : 'Save Updates'}
             </button>
           </div>
         </div>

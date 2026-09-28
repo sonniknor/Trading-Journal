@@ -13,7 +13,7 @@ export default async function PlaybookPage() {
     <div className="animate-in space-y-6">
       <header>
         <h1 className="text-3xl font-bold text-white mb-2">Playbook</h1>
-        <p className="text-gray-400">Ditt bibliotek av A-setups. Studer disse mønstrene for å trene opp øyet ditt.</p>
+        <p className="text-gray-400">Your library of A-setups. Study these patterns to train your eye.</p>
       </header>
       
       <PlaybookClient trades={aTrades} />

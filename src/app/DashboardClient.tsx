@@ -34,9 +34,9 @@ export default function DashboardClient({
   return (
     <div className="space-y-8 animate-in">
       <header>
-        <h1 className="text-3xl font-bold text-white mb-2">Oversikt</h1>
+        <h1 className="text-3xl font-bold text-white mb-2">Dashboard</h1>
         <p className="text-gray-400">
-          Velkommen tilbake! Du har loggført {tradeCount} trades totalt.
+          Welcome back! You have logged {tradeCount} trades in total.
         </p>
       </header>
 
@@ -76,7 +76,7 @@ export default function DashboardClient({
           {tradeCount === 0 && (
             <div className="flex items-center gap-2 text-yellow-400 text-sm font-medium">
               <AlertCircle className="w-4 h-4" />
-              Ingen trades enda
+              No trades yet
             </div>
           )}
         </div>
@@ -134,7 +134,7 @@ function MetricCard({ title, value, isPositive, isCurrency, icon }: { title: str
         </div>
         <div className={`flex items-center gap-1 text-xs font-medium px-2 py-1 rounded-full ${isPositive ? 'bg-green-500/10 text-green-400' : 'bg-red-500/10 text-red-400'}`}>
           {isPositive ? <ArrowUpRight className="w-3 h-3" /> : <ArrowDownRight className="w-3 h-3" />}
-          {isPositive ? (isCurrency ? 'Profitt' : 'Bra') : (isCurrency ? 'Tap' : 'Advarsel')}
+          {isPositive ? (isCurrency ? 'Profit' : 'Good') : (isCurrency ? 'Loss' : 'Warning')}
         </div>
       </div>
       <div>

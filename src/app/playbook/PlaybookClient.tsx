@@ -2,7 +2,7 @@
 
 import { Trade } from '@prisma/client';
 import { format } from 'date-fns';
-import { nb } from 'date-fns/locale';
+import { enUS } from 'date-fns/locale';
 import { Image as ImageIcon, Star, Activity, Clock } from 'lucide-react';
 
 export default function PlaybookClient({ trades }: { trades: Trade[] }) {
@@ -12,9 +12,9 @@ export default function PlaybookClient({ trades }: { trades: Trade[] }) {
         <div className="w-16 h-16 bg-blue-500/10 text-blue-400 rounded-full flex items-center justify-center mx-auto mb-4">
           <Star className="w-8 h-8" />
         </div>
-        <h2 className="text-xl font-bold text-white">Playbooken er tom</h2>
+        <h2 className="text-xl font-bold text-white">Playbook is empty</h2>
         <p className="text-gray-400 max-w-md mx-auto">
-          Du har ikke gradert noen trades som "A" enda. Gå til Journalen og marker dine beste setups som "A" for å bygge opp playbooken din.
+          You haven't graded any trades as "A" yet. Go to the Journal and mark your best setups as "A" to build your playbook.
         </p>
       </div>
     );
@@ -33,7 +33,7 @@ export default function PlaybookClient({ trades }: { trades: Trade[] }) {
             ) : (
               <div className="text-center text-gray-500 space-y-2">
                 <ImageIcon className="w-10 h-10 mx-auto opacity-50" />
-                <p className="text-xs">Bilde mangler</p>
+                <p className="text-xs">Missing Image</p>
               </div>
             )}
             
@@ -55,9 +55,9 @@ export default function PlaybookClient({ trades }: { trades: Trade[] }) {
           <div className="p-5 flex-1 flex flex-col">
             <div className="flex justify-between items-start mb-4">
               <div>
-                <h3 className="text-lg font-bold text-white">{trade.setup || 'Ukjent Setup'}</h3>
+                <h3 className="text-lg font-bold text-white">{trade.setup || 'Unknown Setup'}</h3>
                 <p className="text-xs text-gray-400 flex items-center gap-1 mt-1">
-                  <Clock className="w-3 h-3" /> {format(new Date(trade.entryTime), 'd. MMM yyyy, HH:mm', { locale: nb })}
+                  <Clock className="w-3 h-3" /> {format(new Date(trade.entryTime), 'MMM d, yyyy, HH:mm', { locale: enUS })}
                 </p>
               </div>
               <span className={`px-2 py-1 rounded text-xs font-semibold ${trade.direction === 'Long' ? 'bg-green-500/10 text-green-400' : 'bg-red-500/10 text-red-400'}`}>
