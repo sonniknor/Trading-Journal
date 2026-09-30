@@ -1,11 +1,15 @@
 'use client';
 
+import { useState } from 'react';
 import { Trade } from '@prisma/client';
 import { format } from 'date-fns';
 import { enUS } from 'date-fns/locale';
-import { Image as ImageIcon, Star, Activity, Clock } from 'lucide-react';
+import { Image as ImageIcon, Star, Activity, Clock, X, Upload } from 'lucide-react';
+import Link from 'next/link';
 
 export default function PlaybookClient({ trades }: { trades: Trade[] }) {
+  const [selectedTrade, setSelectedTrade] = useState<Trade | null>(null);
+
   if (trades.length === 0) {
     return (
       <div className="glass-panel p-12 rounded-3xl text-center space-y-4">
@@ -21,9 +25,14 @@ export default function PlaybookClient({ trades }: { trades: Trade[] }) {
   }
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-      {trades.map((trade) => (
-        <div key={trade.id} className="glass-panel rounded-2xl overflow-hidden hover-lift group flex flex-col">
+    <div className="space-y-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {trades.map((trade) => (
+          <div 
+            key={trade.id} 
+            onClick={() => setSelectedTrade(trade)}
+            className="glass-panel rounded-2xl overflow-hidden hover-lift group flex flex-col cursor-pointer"
+          >
           {/* Image Placeholder / Actual Image */}
           <div className="h-48 bg-black/40 relative flex items-center justify-center overflow-hidden border-b border-white/5">
             {trade.screenshots ? (
@@ -77,8 +86,114 @@ export default function PlaybookClient({ trades }: { trades: Trade[] }) {
               </div>
             )}
           </div>
+          </div>
+        ))}
+      </div>
+
+      {selectedTrade && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-6 bg-black/50 backdrop-blur-sm">
+          <div className="bg-gray-900 border border-white/10 rounded-2xl w-full max-w-2xl flex flex-col overflow-hidden shadow-2xl animate-in fade-in zoom-in-95 max-h-full min-h-0">
+            {/* Header */}
+            <div className="p-4 border-b border-white/10 flex justify-between items-center bg-black/20 shrink-0">
+              <h3 className="text-xl font-bold text-white flex items-center gap-2">
+                <Star className="w-5 h-5 text-yellow-400 fill-yellow-400" /> 
+                A-Setup Details
+              </h3>
+              <button onClick={() => setSelectedTrade(null)} className="p-2 bg-white/5 hover:bg-white/10 rounded-xl transition-colors text-gray-400 hover:text-white">
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+            
+            {/* Scrollable Body */}
+            <div className="flex-1 overflow-y-auto min-h-0 relative">
+              <div className="p-6 space-y-6">
+                {/* Screenshot */}
+                <div className="rounded-xl overflow-hidden bg-black/50 border border-white/5">
+                  {selectedTrade.screenshots ? (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img src={selectedTrade.screenshots} alt="Trade Screenshot" className="w-full h-auto object-cover" />
+                  ) : (
+                    <div className="p-10 text-center text-gray-500">
+                      <Upload className="w-8 h-8 mx-auto mb-2 opacity-50" />
+                      <p className="text-sm">No screenshot uploaded</p>
+                    </div>
+                  )}
+                </div>
+
+                <div className="flex gap-4">
+                  <div className="flex-1 bg-white/5 p-3 rounded-xl border border-white/5">
+                    <p className="text-xs text-gray-400 mb-1">Entry Price</p>
+                    <p className="font-mono text-white">{selectedTrade.entryPrice}</p>
+                  </div>
+                  <Activity className="w-5 h-5 text-gray-500 my-auto" />
+                  <div className="flex-1 bg-white/5 p-3 rounded-xl border border-white/5">
+                    <p className="text-xs text-gray-400 mb-1">Exit Price</p>
+                    <p className="font-mono text-white">{selectedTrade.exitPrice}</p>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-2 gap-3">
+                  <StatBox label="Symbol" value={selectedTrade.symbol} />
+                  <StatBox label="Direction" value={selectedTrade.direction} />
+                  <StatBox label="Setup" value={selectedTrade.setup || '-'} />
+                  <StatBox label="Session" value={selectedTrade.session || '-'} />
+                  <StatBox label="Timeframe" value={selectedTrade.timeframe || '-'} />
+                  <StatBox label="Account Type" value={selectedTrade.accountType || '-'} />
+                  <StatBox label="HTF Bias" value={selectedTrade.htfBias || '-'} />
+                  <StatBox label="SMT" value={selectedTrade.smtType || '-'} />
+                </div>
+
+                <div className="grid grid-cols-2 gap-3">
+                  <StatBox label="Planned R:R" value={selectedTrade.plannedRr ? selectedTrade.plannedRr.toString() : '-'} />
+                  <StatBox label="Result R:R" value={selectedTrade.resultRr ? selectedTrade.resultRr.toString() : '-'} />
+                  <StatBox label="MFE" value={selectedTrade.mfe ? selectedTrade.mfe.toString() : '-'} />
+                  <StatBox label="MAE" value={selectedTrade.mae ? selectedTrade.mae.toString() : '-'} />
+                </div>
+
+                <div className="space-y-2">
+                  <h4 className="text-sm font-semibold text-gray-400 uppercase">Analysis & Notes</h4>
+                  <div className="bg-white/5 p-4 rounded-xl border border-white/5 space-y-3">
+                    <div>
+                      <span className="text-xs text-gray-500">Emotional State</span>
+                      <p className="text-sm text-white font-medium">{selectedTrade.emotionalState || '-'}</p>
+                    </div>
+                    <div>
+                      <span className="text-xs text-gray-500">Rules Followed?</span>
+                      <p className="text-sm text-white font-medium">{selectedTrade.rulesFollowed ? '✅ Yes' : '❌ No'}</p>
+                    </div>
+                    {!selectedTrade.rulesFollowed && selectedTrade.ruleBroken && (
+                      <div>
+                        <span className="text-xs text-gray-500 text-red-400">Rule Broken</span>
+                        <p className="text-sm text-white font-medium">{selectedTrade.ruleBroken}</p>
+                      </div>
+                    )}
+                    <div>
+                      <span className="text-xs text-gray-500">Notes</span>
+                      <p className="text-sm text-white whitespace-pre-wrap">{selectedTrade.notes || '-'}</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Footer */}
+            <div className="p-4 border-t border-white/10 bg-black/20 flex justify-end shrink-0">
+              <Link href="/journal" className="text-sm font-medium text-blue-400 hover:text-blue-300 transition-colors bg-blue-500/10 px-4 py-2 rounded-lg">
+                Go to Journal for full details &rarr;
+              </Link>
+            </div>
+          </div>
         </div>
-      ))}
+      )}
+    </div>
+  );
+}
+
+function StatBox({ label, value }: { label: string, value: string }) {
+  return (
+    <div className="bg-white/5 p-3 rounded-xl border border-white/5">
+      <p className="text-xs text-gray-500 uppercase font-medium">{label}</p>
+      <p className="font-semibold text-white mt-1">{value}</p>
     </div>
   );
 }
