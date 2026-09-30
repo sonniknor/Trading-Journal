@@ -68,23 +68,26 @@ export default async function RulesBanner() {
   if (alerts.length === 0) return null;
 
   return (
-    <div className="fixed top-6 right-6 z-50 flex flex-col gap-3 w-80">
+    <div className="fixed top-6 right-6 z-50 flex flex-col items-end gap-3">
       {alerts.map((alert, idx) => {
         const isCritical = alert.level === 'critical';
         return (
           <div 
             key={idx}
-            className={`glass-panel p-3 rounded-xl flex items-start gap-3 border shadow-2xl ${isCritical ? 'border-red-500/40 bg-red-950/80 backdrop-blur-md' : 'border-yellow-500/40 bg-yellow-950/80 backdrop-blur-md'} animate-in`}
+            className="group relative flex items-center justify-center"
             style={{ animationDelay: `${idx * 100}ms` }}
           >
-            <div className={`mt-0.5 ${isCritical ? 'text-red-400' : 'text-yellow-400'}`}>
-              <alert.icon className="w-5 h-5" />
+            {/* The Icon Button */}
+            <div className={`glass-panel w-12 h-12 rounded-full flex items-center justify-center border shadow-2xl cursor-pointer transition-all duration-300 hover:scale-110 ${isCritical ? 'border-red-500/40 bg-red-950/80 text-red-400' : 'border-yellow-500/40 bg-yellow-950/80 text-yellow-400'} animate-in`}>
+              <alert.icon className="w-6 h-6" />
             </div>
-            <div>
+
+            {/* The Expanded Tooltip */}
+            <div className={`absolute right-14 top-0 w-72 glass-panel p-4 rounded-2xl border shadow-2xl opacity-0 group-hover:opacity-100 scale-95 group-hover:scale-100 pointer-events-none group-hover:pointer-events-auto transition-all duration-300 origin-top-right ${isCritical ? 'border-red-500/40 bg-red-950/90 backdrop-blur-md' : 'border-yellow-500/40 bg-yellow-950/90 backdrop-blur-md'}`}>
               <h4 className={`font-bold text-sm ${isCritical ? 'text-red-400' : 'text-yellow-400'}`}>
                 {alert.title}
               </h4>
-              <p className="text-gray-200 text-xs mt-1 leading-relaxed">{alert.message}</p>
+              <p className="text-gray-200 text-xs mt-1.5 leading-relaxed">{alert.message}</p>
             </div>
           </div>
         );
