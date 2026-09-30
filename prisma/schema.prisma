@@ -38,6 +38,7 @@ model Trade {
   emotionalState  String?  // "Rolig", "Tilted", "FOMO", etc.
   notes           String?
   screenshots     String?  // Comma separated URLs or JSON array string
+  accountType     String?  // "Evaluation" or "Funded"
 
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt

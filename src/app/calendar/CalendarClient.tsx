@@ -22,15 +22,21 @@ import { ChevronLeft, ChevronRight, TrendingUp, TrendingDown, Target, X } from '
 export default function CalendarClient({ trades }: { trades: Trade[] }) {
   const [currentDate, setCurrentDate] = useState(new Date());
   const [selectedDay, setSelectedDay] = useState<Date | null>(null);
+  const [accountFilter, setAccountFilter] = useState<string>('All');
 
   const prevMonth = () => setCurrentDate(subMonths(currentDate, 1));
   const nextMonth = () => setCurrentDate(addMonths(currentDate, 1));
+
+  const filteredTrades = useMemo(() => {
+    if (accountFilter === 'All') return trades;
+    return trades.filter(t => t.accountType === accountFilter);
+  }, [trades, accountFilter]);
 
   // Compute daily stats
   const dailyStats = useMemo(() => {
     const stats: Record<string, { pnl: number; tradesCount: number }> = {};
     
-    trades.forEach(trade => {
+    filteredTrades.forEach(trade => {
       const dateKey = format(new Date(trade.entryTime), 'yyyy-MM-dd');
       if (!stats[dateKey]) {
         stats[dateKey] = { pnl: 0, tradesCount: 0 };
@@ -40,7 +46,7 @@ export default function CalendarClient({ trades }: { trades: Trade[] }) {
     });
     
     return stats;
-  }, [trades]);
+  }, [filteredTrades]);
 
   // Generate calendar grid (including leading/trailing days)
   const monthStart = startOfMonth(currentDate);
@@ -53,7 +59,7 @@ export default function CalendarClient({ trades }: { trades: Trade[] }) {
   const days = eachDayOfInterval({ start: startDate, end: endDate });
 
   // Calculate monthly overview
-  const currentMonthTrades = trades.filter(t => isSameMonth(new Date(t.entryTime), currentDate));
+  const currentMonthTrades = filteredTrades.filter(t => isSameMonth(new Date(t.entryTime), currentDate));
   const monthlyPnL = currentMonthTrades.reduce((sum, t) => sum + t.pnl, 0);
   const winningDays = Object.values(dailyStats)
     .filter(stat => stat.pnl >= 50).length;
@@ -62,8 +68,8 @@ export default function CalendarClient({ trades }: { trades: Trade[] }) {
 
   const selectedDayTrades = useMemo(() => {
     if (!selectedDay) return [];
-    return trades.filter(t => isSameDay(new Date(t.entryTime), selectedDay));
-  }, [selectedDay, trades]);
+    return filteredTrades.filter(t => isSameDay(new Date(t.entryTime), selectedDay));
+  }, [selectedDay, filteredTrades]);
 
   return (
     <div className="space-y-6">
@@ -108,8 +114,18 @@ export default function CalendarClient({ trades }: { trades: Trade[] }) {
           <h2 className="text-2xl font-bold text-white capitalize">
             {format(currentDate, 'MMMM yyyy', { locale: enUS })}
           </h2>
-          <div className="flex gap-2">
-            <button onClick={prevMonth} className="p-2 rounded-xl hover:bg-white/10 text-gray-400 hover:text-white transition-colors">
+          <div className="flex items-center gap-4">
+            <select 
+              value={accountFilter} 
+              onChange={(e) => setAccountFilter(e.target.value)}
+              className="bg-black/50 border border-white/10 rounded-lg p-2 text-white focus:outline-none focus:border-blue-500 text-sm font-medium"
+            >
+              <option value="All">All Accounts</option>
+              <option value="Evaluation">Evaluation</option>
+              <option value="Funded">Funded</option>
+            </select>
+            <div className="flex gap-2">
+              <button onClick={prevMonth} className="p-2 rounded-xl hover:bg-white/10 text-gray-400 hover:text-white transition-colors">
               <ChevronLeft className="w-5 h-5" />
             </button>
             <button onClick={() => setCurrentDate(new Date())} className="px-4 py-2 text-sm font-medium rounded-xl hover:bg-white/10 text-gray-300 transition-colors">
@@ -118,6 +134,7 @@ export default function CalendarClient({ trades }: { trades: Trade[] }) {
             <button onClick={nextMonth} className="p-2 rounded-xl hover:bg-white/10 text-gray-400 hover:text-white transition-colors">
               <ChevronRight className="w-5 h-5" />
             </button>
+            </div>
           </div>
         </div>
 

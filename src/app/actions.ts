@@ -56,6 +56,18 @@ export async function updateTrade(id: string, data: Partial<Prisma.TradeUpdateIn
   }
 }
 
+export async function deleteTrade(id: string) {
+  try {
+    await prisma.trade.delete({
+      where: { id }
+    });
+    return { success: true };
+  } catch (error: any) {
+    console.error("Error deleting trade:", error);
+    return { success: false, error: error.message };
+  }
+}
+
 import { writeFile } from 'fs/promises';
 import { join } from 'path';
 

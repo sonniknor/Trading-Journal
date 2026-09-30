@@ -3,8 +3,8 @@
 import { useState, useEffect } from 'react';
 import { format } from 'date-fns';
 import { Trade } from '@prisma/client';
-import { updateTrade, uploadScreenshot } from '@/app/actions';
-import { X, Save, ArrowRight, Activity, Clock, Upload, Edit3 } from 'lucide-react';
+import { updateTrade, uploadScreenshot, deleteTrade } from '@/app/actions';
+import { X, Save, ArrowRight, Activity, Clock, Upload, Edit3, Trash2 } from 'lucide-react';
 
 export default function JournalClient({ initialTrades }: { initialTrades: Trade[] }) {
   const [trades, setTrades] = useState<Trade[]>(initialTrades);
@@ -56,6 +56,7 @@ export default function JournalClient({ initialTrades }: { initialTrades: Trade[
       session: formData.get('session') as string,
       grade: formData.get('grade') as string,
       emotionalState: formData.get('emotionalState') as string,
+      accountType: formData.get('accountType') as string,
       notes: formData.get('notes') as string,
       newsCatalyst: formData.get('newsCatalyst') === 'on',
       rulesFollowed: formData.get('rulesFollowed') === 'on',
@@ -73,6 +74,21 @@ export default function JournalClient({ initialTrades }: { initialTrades: Trade[
       setIsEditing(false);
     } else {
       alert("Error saving trade.");
+    }
+    setIsSaving(false);
+  };
+
+  const handleDelete = async () => {
+    if (!selectedTrade) return;
+    if (!confirm("Are you sure you want to delete this trade? This action cannot be undone and will remove the trade from all pages.")) return;
+    
+    setIsSaving(true);
+    const result = await deleteTrade(selectedTrade.id);
+    if (result.success) {
+      setTrades(trades.filter(t => t.id !== selectedTrade.id));
+      setSelectedTrade(null);
+    } else {
+      alert("Error deleting trade.");
     }
     setIsSaving(false);
   };
@@ -265,6 +281,15 @@ export default function JournalClient({ initialTrades }: { initialTrades: Trade[
                 </div>
 
                 <div className="space-y-1">
+                  <label className="text-xs text-gray-400 uppercase font-semibold">Account Type</label>
+                  <select name="accountType" defaultValue={selectedTrade.accountType || ""} className="w-full bg-black/50 border border-white/10 rounded-lg p-2 text-white focus:outline-none focus:border-blue-500">
+                    <option value="">Select account...</option>
+                    <option value="Evaluation">Evaluation</option>
+                    <option value="Funded">Funded</option>
+                  </select>
+                </div>
+
+                <div className="space-y-1">
                   <label className="text-xs text-gray-400 uppercase font-semibold">Planned R:R</label>
                   <input name="plannedRr" type="number" step="0.1" defaultValue={selectedTrade.plannedRr ?? ""} placeholder="E.g. 3.0" className="w-full bg-black/50 border border-white/10 rounded-lg p-2 text-white focus:outline-none focus:border-blue-500" />
                 </div>
@@ -334,13 +359,23 @@ export default function JournalClient({ initialTrades }: { initialTrades: Trade[
           </div>
           <div className="p-4 border-t border-white/5 bg-black/20">
             {!isEditing ? (
-              <button 
-                onClick={() => setIsEditing(true)}
-                className="w-full bg-white/10 hover:bg-white/20 text-white py-3 rounded-xl font-semibold flex items-center justify-center gap-2 transition-all hover-lift"
-              >
-                <Edit3 className="w-5 h-5" />
-                Edit Trade
-              </button>
+              <div className="flex gap-2">
+                <button 
+                  onClick={() => setIsEditing(true)}
+                  className="flex-1 bg-white/10 hover:bg-white/20 text-white py-3 rounded-xl font-semibold flex items-center justify-center gap-2 transition-all hover-lift"
+                >
+                  <Edit3 className="w-5 h-5" />
+                  Edit Trade
+                </button>
+                <button 
+                  onClick={handleDelete}
+                  disabled={isSaving}
+                  className="px-4 bg-red-500/10 hover:bg-red-500/20 text-red-400 rounded-xl flex items-center justify-center transition-all disabled:opacity-50"
+                  title="Delete Trade"
+                >
+                  <Trash2 className="w-5 h-5" />
+                </button>
+              </div>
             ) : (
               <div className="flex gap-2">
                 <button 
@@ -400,6 +435,7 @@ function TradeDetailsView({ trade }: { trade: Trade }) {
         <StatBox label="Setup" value={trade.setup || '-'} />
         <StatBox label="Session" value={trade.session || '-'} />
         <StatBox label="Timeframe" value={trade.timeframe || '-'} />
+        <StatBox label="Account Type" value={trade.accountType || '-'} />
         <StatBox label="Grade" value={trade.grade || '-'} />
         <StatBox label="HTF Bias" value={trade.htfBias || '-'} />
         <StatBox label="SMT" value={trade.smtType || '-'} />
