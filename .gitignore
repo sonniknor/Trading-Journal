@@ -55,3 +55,7 @@ CLAUDE.md
 .claude/
 .cursor/
 .devin/
+
+# Uploads / Screenshots
+public/uploads/*
+!public/uploads/.gitkeep
