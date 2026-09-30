@@ -94,7 +94,7 @@ export default function JournalClient({ initialTrades }: { initialTrades: Trade[
   };
 
   return (
-    <div className="flex gap-6 h-[calc(100vh-150px)]">
+    <div className="flex gap-6 h-[calc(100vh-250px)]">
       {/* Table Section */}
       <div className={`glass-panel rounded-2xl overflow-hidden flex-1 transition-all duration-300 flex flex-col ${selectedTrade ? 'w-2/3' : 'w-full'}`}>
         <div className="overflow-y-auto flex-1">
